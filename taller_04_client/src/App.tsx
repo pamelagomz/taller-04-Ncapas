@@ -1,6 +1,6 @@
 import './App.css'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import {PRIVATE} from "@/routes/Paths.tsx";
+import {APPOINTMENTS, HISTORY, PRIVATE} from "@/routes/Paths.tsx";
 
 import PrivateRoute from "@/routes/PrivateRoute.tsx";
 import PublicRoute from "@/routes/PublicRoute.tsx";
@@ -34,12 +34,12 @@ const router = createBrowserRouter([
                 element: <RegisterView />,
             },
             {
-                path: "historyEntry",
+                path: HISTORY,
                 element: <HistoryEntryView/>,
 
             },
             {
-                path: "appointments",
+                path: APPOINTMENTS,
                 element: <AppointmentTableView/>,
 
             }

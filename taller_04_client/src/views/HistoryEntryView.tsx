@@ -14,6 +14,7 @@ import DatePickerForm from "@/components/ui/datepicker.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import React from "react";
 import {Select} from "@/components/ui/dropdown.tsx";
+import {Input} from "@/components/ui/input.tsx";
 
 export const FormSchema = z.object({
     patient: z.string({
@@ -28,14 +29,7 @@ export const FormSchema = z.object({
 })
 
 export default function HistoryEntryView() {
-
-    const patients = [
-        {id: '1', name: 'Paciente 1'},
-        {id: '2', name: 'Paciente 2'},
-        {id: '3', name: 'Paciente 3'},
-        {id: '4', name: 'Paciente 4'},
-        {id: '5', name: 'Paciente 5'},
-    ];
+    
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -57,22 +51,17 @@ export default function HistoryEntryView() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-8">
 
                         <div className="grid gap-4">
-                            <label htmlFor="message-2">Nombre del paciente </label>
-                            <Select data={patients} {...form.register("patient")} name={"patient"} required>
-                                <option value="" disabled>
-                                    Selecciona un paciente
-                                </option>
-                                {patients.map((patient) => (
-                                    <option key={patient.id} value={patient.id}>
-                                        {patient.name}
-                                    </option>
-                                ))}
-                            </Select>
+                            <label htmlFor="patient">Nombre del paciente </label>
+                            <Input {...form.register("patient")}
+                                   name={"patient"}
+                                   id={"patient"}
+                                   required placeholder={"Identificador del paciente"}
+                            />
 
                         </div>
 
                         <div className="grid gap-4">
-                            <Label htmlFor="message-2">Razon de la entrada</Label>
+                            <Label htmlFor="reason">Razon de la entrada</Label>
                             <Textarea
                                 {...form.register("reason")}
                                 name={"reason"}
