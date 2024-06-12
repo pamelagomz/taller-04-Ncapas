@@ -7,6 +7,8 @@ import PublicRoute from "@/routes/PublicRoute.tsx";
 import LoginView from "@/views/LoginView.tsx";
 import RegisterView from "@/views/RegisterView.tsx";
 import AppointmentView from "@/views/AppointmentView.tsx";
+import HistoryEntryView from "@/views/HistoryEntryView.tsx";
+import AppointmentTableView from "@/views/AppointmentTableView.tsx";
 
 const router = createBrowserRouter([
     {
@@ -30,6 +32,16 @@ const router = createBrowserRouter([
             {
                 path: "signup",
                 element: <RegisterView />,
+            },
+            {
+                path: "historyEntry",
+                element: <HistoryEntryView/>,
+
+            },
+            {
+                path: "appointments",
+                element: <AppointmentTableView/>,
+
             }
         ],
     },

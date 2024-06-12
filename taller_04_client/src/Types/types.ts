@@ -32,3 +32,11 @@ type Entries = {
   homeNumber: string | null
   comment: string | null
 }
+
+type AppointmentRequest = {
+    id: string
+    patient: string
+    date: string
+    reason: string
+    status: string
+}
