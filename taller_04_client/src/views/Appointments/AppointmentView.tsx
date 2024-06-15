@@ -1,10 +1,10 @@
 import {
     Card,
-    CardContent, CardDescription, CardFooter,
+    CardContent,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import {Label} from "@/components/ui/label"
+} from "@/components/ui/card.tsx"
+import {Label} from "@/components/ui/label.tsx"
 import {Button} from "@/components/ui/button.tsx";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -14,8 +14,8 @@ import DatePickerForm from "@/components/ui/datepicker.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import React from "react";
 import {cn} from "@/lib/utils.ts";
-import { CheckIcon } from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
+import {requestAppointment} from "@/hooks/Appointments.tsx";
 
 export const FormSchema = z.object({
     reason: z.string({
@@ -32,8 +32,15 @@ export default function AppointmentView() {
         resolver: zodResolver(FormSchema),
     })
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        toast("You submitted the following values: " + JSON.stringify(data))
+    const onSubmit = async (data: z.infer<typeof FormSchema>) =>{
+        const res = await requestAppointment(data.reason, data.date)
+        if(res){
+            toast.success("Cita agendada correctamente")
+            form.reset()
+        }else{
+            toast.error("Error al agendar la cita")
+            return
+        }
     }
 
     return (
@@ -48,7 +55,7 @@ export default function AppointmentView() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-8">
 
                         <div className="grid gap-4">
-                            <Label htmlFor="message-2">Razon de la consulta medica</Label>
+                            <Label htmlFor="reason">Razon de la consulta medica</Label>
                             <Textarea
                                 {...form.register("reason")}
                                 name={"reason"}
@@ -62,9 +69,10 @@ export default function AppointmentView() {
                         </div>
 
                         <div className="grid gap-4">
-                            <Label htmlFor="email">Fecha de la cita</Label>
+                            <Label htmlFor="date">Fecha de la cita</Label>
                             <DatePickerForm
                                 control={form.control}
+                                id={"date"}
                                 name={"date"}
                             />
                         </div>

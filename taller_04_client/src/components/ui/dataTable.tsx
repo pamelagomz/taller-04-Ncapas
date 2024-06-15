@@ -47,8 +47,8 @@ export function DataTable<TData, TValue>({
                                              addValue,
                                              onAddValue,
                                          }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([]);
 
+    const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
     );
@@ -131,7 +131,7 @@ export function DataTable<TData, TValue>({
                                     return (
                                         <TableHead
                                             key={header.id}
-                                            className="bg-primaryColor text-center font-normal text-white py-3"
+                                            className="bg-gray-950 text-center font-normal text-white h-16"
                                         >
                                             {header.isPlaceholder
                                                 ? null
@@ -182,7 +182,7 @@ export function DataTable<TData, TValue>({
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
-                    Previous
+                    Anterior
                 </Button>
                 <Button
                     variant="outline"
@@ -190,7 +190,7 @@ export function DataTable<TData, TValue>({
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    Next
+                    Siguiente
                 </Button>
             </div>
         </div>

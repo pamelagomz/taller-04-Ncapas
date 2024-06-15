@@ -7,10 +7,48 @@ import {
 } from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button.tsx";
+import {useAuthContext} from "@/providers/AuthContext.tsx";
+import {z} from "zod";
+import {useForm, SubmitHandler} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+
+const registerSchema = z.object({
+    name: z.string({
+        required_error: "A reason is required.",
+    }),
+    password: z.string({
+        required_error: "A reason is required.",
+    }),
+    email: z.string({
+        required_error: "A reason is required.",
+    })
+})
 
 export default function RegisterView() {
+
+    const { register } = useAuthContext();
+    const navigate = useNavigate();
+
+    const form = useForm<z.infer<typeof registerSchema>>({
+        resolver: zodResolver(registerSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            password: ""
+        }
+    })
+
+    const onSubmit: SubmitHandler<z.infer<typeof registerSchema>> = async (data) => {
+        const registerSuccessful = await register(
+            data.name,
+            data.email,
+            data.password
+        )
+        if (registerSuccessful)
+            navigate("/")
+    }
 
     return (
         <section
@@ -31,12 +69,13 @@ export default function RegisterView() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-8">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-8">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Nombre completo</Label>
                             <Input
                                 id="name"
                                 type="text"
+                                {...form.register("name")}
                                 placeholder="Carlos Perez"
                                 required
                             />
@@ -46,6 +85,7 @@ export default function RegisterView() {
                             <Input
                                 id="email"
                                 type="email"
+                                {...form.register("email")}
                                 placeholder="m@example.com"
                                 required
                             />
@@ -55,14 +95,22 @@ export default function RegisterView() {
                             <Input
                                 id="password"
                                 placeholder={"**********"}
+                                {...form.register("password")}
                                 required
                                 type="password"
                             />
                         </div>
-                        <Button type="submit" className="w-full">
+
+                        <Button
+                            type={"submit"}
+                            className="w-full"
+                            disabled={form.formState.isSubmitting}
+                            // onClick={() => {onSubmit(form.getValues() as z.infer<typeof registerSchema>)}}
+                        >
                             Crear una cuenta
                         </Button>
-                    </div>
+
+                    </form>
                     <div className="mt-4 text-center text-sm">
                         Ya tienes una cuenta?{" "}
                         <Link to={"/"} className="underline">

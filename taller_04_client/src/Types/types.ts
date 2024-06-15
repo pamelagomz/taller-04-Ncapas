@@ -1,42 +1,53 @@
 type User = {
   id?: string
-  fullName: string
+  name?: string
   email?: string
+  active: boolean
   roles: string[]
-  homeId?: string
-  dui: string
-  assignedTerminal?: string | null
-}
-
-type Home = {
-  id?: string
-  homeNumber?: number
-  address?: string
-  admin?: User | null
-  users?: User[]
-  membersNumber?: number
-}
-
-type Visitor = {
-  id: string
-  date: string
-  visitorName: string
-  homeNumber: string
-}
-
-type Entries = {
-  id: string
-  date: string
-  entryType: string
-  name: string | null
-  homeNumber: string | null
-  comment: string | null
 }
 
 type AppointmentRequest = {
-    id: string
-    patient: string
-    date: string
-    reason: string
-    status: string
+    id: string;
+    reason: string;
+    f_estimada_finalizacion?: string | null;
+    state: string;
+    prescriptions: string[];
+    f_realizacion?: string | null;
+    f_finalizacion?: string | null;
+    f_solicitada?: string;
+}
+
+type Prescription = {
+    id: string;
+    dosis: string;
+    finalDate: string;
+    medicine: string;
+    medicalAppointment: MedicalAppointment;
+}
+
+type MedicalAppointment = {
+    id: string;
+    reason: string;
+    F_realizacion: string;
+    F_finalizacion: string;
+    F_solicitada: string;
+    f_estimada_finalizacion: string;
+    state: string;
+    prescriptions: Prescription[];
+    attend: Attends;
+}
+
+type Attends = {
+    id: string;
+    user: User;
+    medics: User[];
+    specialization: Specialization;
+    medicalAppointments: MedicalAppointment;
+}
+
+type Specialization = {
+    id: string;
+    code: string;
+    name: string;
+    attends: Attends[];
 }
