@@ -3,7 +3,7 @@ type User = {
   name?: string
   email?: string
   active: boolean
-  roles: string[]
+  roles: Role[]
 }
 
 type AppointmentRequest = {
@@ -11,18 +11,35 @@ type AppointmentRequest = {
     reason: string;
     f_estimada_finalizacion?: string | null;
     state: string;
-    prescriptions: string[];
+    prescriptions: Prescription[];
     f_realizacion?: string | null;
     f_finalizacion?: string | null;
     f_solicitada?: string;
+    attend: Attends;
+}
+
+type DoctorSchedule = {
+    medics: User[];
+    medicalHistories: MedicalHistory[];
+}
+
+type MedicalHistory = {
+    id: string;
+    date: Date;
+    reason: string;
+    user: User;
 }
 
 type Prescription = {
-    id: string;
+    id?: string;
     dosis: string;
-    finalDate: string;
+    finalDate: Date;
     medicine: string;
-    medicalAppointment: MedicalAppointment;
+}
+
+type Role = {
+    code: string;
+    name: string;
 }
 
 type MedicalAppointment = {

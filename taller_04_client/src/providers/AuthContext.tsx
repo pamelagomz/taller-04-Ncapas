@@ -34,8 +34,8 @@ export const AuthContextProvider = (props) => {
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
             try {
-                const {data} = await axios.get<User>("/auth/whoami");
-                setUser(data);
+                const res = await axios.get("/auth/whoami");
+                setUser(res.data.data);
             } catch (error) {
                 logout();
             }
@@ -89,7 +89,7 @@ export const AuthContextProvider = (props) => {
             //     "400": "Email o contraseña incorrectos",
             //     "500": "Unexpected error"
             // };
-            toast.error(msgs[status as "404" | "400" | "500" | "409"]);
+            // toast.error(msgs[status as "404" | "400" | "500" | "409"]);
         }
         return false;
     }

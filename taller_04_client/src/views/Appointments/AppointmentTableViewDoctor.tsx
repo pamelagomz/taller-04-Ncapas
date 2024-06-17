@@ -5,18 +5,21 @@ import {
 } from "react-icons/md";
 import {Button} from "@/components/ui/button.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
-import AppointmentDetail from "@/views/Appointments/AppointmentDetail.tsx";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import useSWR from "swr";
-import {getAppointments, rejectAppointment} from "@/hooks/Appointments.tsx";
+import {finishAppointment, getAppointmentByDoctor} from "@/hooks/Appointments.tsx";
 import {format} from "date-fns";
 import {es} from "date-fns/locale";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card.tsx";
 import {toast} from "sonner";
+import {useAuthContext} from "@/providers/AuthContext.tsx";
+import AddPrescriptionDialog from "@/components/AddPrescriptionDialog.tsx";
 
-export default function AppointmentTableView() {
+export default function AppointmentTableViewDoctor() {
 
-    const {data, isLoading} = useSWR('/appointment/', getAppointments)
+    const {user} = useAuthContext()
+
+    const {data, isLoading} = useSWR(user?.id, getAppointmentByDoctor)
 
     const columns: ColumnDef<AppointmentRequest>[] = [
         {
@@ -33,27 +36,28 @@ export default function AppointmentTableView() {
                 );
             },
             cell: ({cell}) => {
+                if (cell.row.original.f_solicitada === null) return
                 const date = new Date(cell.row.original.f_solicitada!);
                 const formattedDate = format(date, "PPP,p", {locale: es})
                 return <p>{formattedDate}</p>;
             }
         },
         {
-            accessorKey: "f_estimada_finalizacion",
+            accessorKey: "f_finalizacion",
             header: ({column}) => {
                 return (
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-                        ETA de finalizacion
+                        Fecha de finalizacion
                         <MdKeyboardArrowDown className="ml-2 h-4 w-4"/>
                     </Button>
                 );
             },
             cell: ({cell}) => {
-                if (cell.row.original.f_estimada_finalizacion === null) return <p>-</p>;
-                const date = new Date(cell.row.original.f_estimada_finalizacion!);
+                if (cell.row.original.f_finalizacion === null) return <p>-</p>;
+                const date = new Date(cell.row.original.f_finalizacion!);
                 const formattedDate = format(date, "PPP, p", {locale: es})
                 return <p>{formattedDate}</p>;
             }
@@ -65,7 +69,7 @@ export default function AppointmentTableView() {
                 return (
                     <HoverCard>
                         <HoverCardTrigger>
-                            {cell.row.original.reason.length > 50
+                            {cell.row.original.reason && cell.row.original.reason.length > 50
                                 ? `${cell.row.original.reason.substring(0, 50)}..`
                                 : cell.row.original.reason}
                         </HoverCardTrigger>
@@ -73,7 +77,7 @@ export default function AppointmentTableView() {
                             {cell.row.original.reason}
                         </HoverCardContent>
                     </HoverCard>
-                    );
+                );
             }
         },
         {
@@ -95,22 +99,22 @@ export default function AppointmentTableView() {
             header: "Actions",
             cell: ({cell}) => {
                 return (
-                    <div className={'flex flex-row gap-2 justify-center items-center'}>
-                        <AppointmentDetail appointment={cell.row.original}/>
+                    <div className={'space-x-2'}>
+                        <AddPrescriptionDialog medicalAppointmentId={cell.row.original.id}/>
                         <Button
                             variant="default"
-                            onClick={ () => {
+                            onClick={() => {
                                 toast.promise(
-                                    rejectAppointment(cell.row.original.id),
+                                    finishAppointment(cell.row.original.id),
                                     {
-                                        loading: 'Rechazando',
-                                        success: 'Cita rechazada',
-                                        error: 'Error al rechazar la cita',
+                                        loading: 'Finalizando cita...',
+                                        success: 'Cita finalizada',
+                                        error: 'Error al finalizar la cita',
                                     }
                                 )
                             }}
                         >
-                            Rechazar cita
+                            Finalizar cita
                         </Button>
                     </div>
                 );
@@ -122,7 +126,7 @@ export default function AppointmentTableView() {
         <div className="container min-h-[100dvh] flex flex-col justify-center items-center gap-12">
             <Card className={'w-full'}>
                 <CardHeader>
-                    <CardTitle>Lista de solicitudes de citas medicas</CardTitle>
+                    <CardTitle>Lista de citas medica asignadas</CardTitle>
                     <CardDescription>
                         En este apartado puedes administrar las solicitudes de citas medicas
                     </CardDescription>
@@ -142,3 +146,7 @@ export default function AppointmentTableView() {
         </div>
     );
 }
+
+// <PrescriptionDialog
+//     identifier={cell.row.original.attend.user.id!}
+// />

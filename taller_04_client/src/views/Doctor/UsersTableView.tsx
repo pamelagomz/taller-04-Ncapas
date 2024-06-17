@@ -6,9 +6,9 @@ import {
 import {Button} from "@/components/ui/button.tsx";
 import useSWR from "swr";
 import {getAllUsers} from "@/hooks/User.tsx";
-import UserUpdateDialog from "@/views/Users/UserUpdateDialog.tsx";
+import PrescriptionDialog from "@/components/PrescriptionDialog.tsx";
 
-export default function UsersAdministration() {
+export default function UsersTableView() {
 
     const {data, isLoading} = useSWR('/user/all', getAllUsers)
 
@@ -28,24 +28,23 @@ export default function UsersAdministration() {
             },
         },
         {
-            accessorKey: "roles",
-            header: "Rol",
-            cell: ({cell}) => {
-                return (
-                    <UserUpdateDialog
-                        identifier={cell.row.original.email!}
-                        roles={cell.row.original.roles!}
-                    />
-                );
-            }
-        },
-        {
             accessorKey: "name",
             header: "Nombre",
         },
         {
             accessorKey: "email",
             header: "Correo electrónico",
+        },
+        {
+            accessorKey: "actions",
+            header: "Acciones",
+            cell: ({cell}) => {
+                return (
+                    <PrescriptionDialog
+                        identifier={cell.row.original.id!}
+                    />
+                );
+            }
         }
     ];
 
@@ -54,12 +53,12 @@ export default function UsersAdministration() {
             <h1 className="self-start text-3xl">{"Lista de usuarios registrados"}</h1>
             {isLoading && <p>Cargando...</p>}
             {data &&
-            <DataTable
-                columns={columns}
-                data={data}
-                shearchValue="name"
-                searhValuePlaceholder="Buscar por nombre de usuario..."
-            />}
+                <DataTable
+                    columns={columns}
+                    data={data}
+                    shearchValue="name"
+                    searhValuePlaceholder="Buscar por nombre de usuario..."
+                />}
         </div>
     );
 }

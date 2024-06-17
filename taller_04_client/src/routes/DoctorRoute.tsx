@@ -1,10 +1,8 @@
-import {Link, Outlet, useNavigate} from "react-router-dom";
+import { Outlet, useNavigate} from "react-router-dom";
 import {useAuthContext} from "@/providers/AuthContext.tsx";
-import {Button} from "@/components/ui/button.tsx";
-import {useEffect} from "react";
 import Navbar from "@/components/Navbar.tsx";
 
-export default function AssistantsRoute() {
+export default function DoctorRoute() {
 
     const navigate = useNavigate();
     const {user, logout} = useAuthContext();
@@ -18,11 +16,15 @@ export default function AssistantsRoute() {
     const routes = [
         {
             name: "Medical Appointments",
-            route: "/assistant"
+            route: "/doctor"
         },
         {
-            name: "History",
-            route: "/assistant/history"
+            name: "Prescriptions",
+            route: "/doctor/prescriptions"
+        },
+        {
+            name: "Schedule",
+            route: "/doctor/schedule"
         }
     ]
 
@@ -30,7 +32,7 @@ export default function AssistantsRoute() {
         <div
             className={"grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[240px_1fr]"}
         >
-            <Navbar routes={routes}/>
+            <Navbar routes={routes} />
             <Outlet/>
         </div>
     );

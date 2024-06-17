@@ -4,9 +4,9 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
+} from "@/components/ui/card.tsx"
+import {Input} from "@/components/ui/input.tsx"
+import {Label} from "@/components/ui/label.tsx"
 import {Link, useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button.tsx";
 import {z} from "zod";
@@ -39,7 +39,7 @@ export default function LoginView() {
             data.password
         )
         if (loginSuccessful)
-            navigate("/appointments")
+            navigate("/user")
     }
 
     return (

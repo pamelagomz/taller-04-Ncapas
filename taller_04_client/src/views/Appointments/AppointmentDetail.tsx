@@ -1,10 +1,10 @@
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { Label } from "@/components/ui/label.tsx";
+import {z} from "zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {toast} from "sonner";
+import {Label} from "@/components/ui/label.tsx";
 import DatePickerForm from "@/components/ui/datepicker.tsx";
-import { Button } from "@/components/ui/button.tsx";
+import {Button} from "@/components/ui/button.tsx";
 import {
     Dialog, DialogClose,
     DialogContent,
@@ -20,17 +20,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import useSWR from "swr";
-import { getDoctors } from "@/hooks/Appointments.tsx";
-import { Key } from "react";
+import {Input} from "@/components/ui/input"
+import useSWR, { mutate } from "swr";
+import {approveAppointment, getDoctors} from "@/hooks/Appointments.tsx";
+import {Key} from "react";
 import {
     DropdownMenu, DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import {ChevronDown} from "lucide-react";
-import * as React from "react";
 
 export const FormSchema = z.object({
     estimateTime: z.string({
@@ -49,24 +48,41 @@ interface AppointmentDetailProps {
 
 export function AppointmentDetail({appointment}: AppointmentDetailProps) {
 
-    const {data: doctors, isLoading : isLoadingD} = useSWR('/clinic/doctors', getDoctors)
-    const {data: specializations, isLoading : isLoadingS} = useSWR('/clinic/specializations', getDoctors)
+    const {data: doctors} = useSWR('/clinic/doctors', getDoctors)
+    const {data: specializations} = useSWR('/clinic/specializations', getDoctors)
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             estimateTime: "",
-            hour: "",
             date: new Date(),
-            doctorId: "",
+            doctorId: [],
             specialityCode: "",
         }
     })
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        toast("You submitted the following values: " + JSON.stringify(data))
-        console.log(data)
+    const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+        //toast("You submitted the following values: " + JSON.stringify(data))
+        toast.promise(approveAppointment(
+            appointment.id,
+            data.date,
+            parseInt(data.estimateTime),
+            data.doctorId,
+            data.specialityCode
+        ), {
+            loading: 'Guardando cita',
+            success: 'Cita guardada',
+            error: 'Error al guardar la cita',
+        })
+
+        toast.promise(mutate('/appointment/'), {
+            loading: 'Cargando citas',
+            success: 'Citas cargadas',
+            error: 'Error al cargar las citas',
+        })
     }
+
+    const doctorIds = form.watch("doctorId");
 
     return (
         <Dialog>
@@ -107,7 +123,7 @@ export function AppointmentDetail({appointment}: AppointmentDetailProps) {
                                     variant="outline"
                                 >
                                     Selecciona la lista de doctores
-                                    <ChevronDown className="ml-4 h-4 w-4 opacity-50" />
+                                    <ChevronDown className="ml-4 h-4 w-4 opacity-50"/>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[375px]">
@@ -118,12 +134,13 @@ export function AppointmentDetail({appointment}: AppointmentDetailProps) {
                                     }, index: number) => (
                                         <DropdownMenuCheckboxItem
                                             key={index}
-                                            checked={form.getValues("doctorId").includes(doctor.id)}
+                                            checked={doctorIds.includes(doctor.id)}
                                             onCheckedChange={(checked) => {
                                                 if (checked) {
-                                                    form.setValue("doctorId", [...form.getValues("doctorId"), doctor.id])
+                                                    form.setValue("doctorId", [...doctorIds, doctor.id])
                                                 } else {
-                                                    form.setValue("doctorId", form.getValues("doctorId").filter((id: string) => id !== doctor.id))}
+                                                    form.setValue("doctorId", doctorIds.filter((id: string) => id !== doctor.id))
+                                                }
                                             }}
                                         >
                                             {doctor.name}
@@ -155,7 +172,9 @@ export function AppointmentDetail({appointment}: AppointmentDetailProps) {
                             </SelectContent>
                         </Select>
                     </div>
-                    <Button type="submit">{'Aceptar cita'}</Button>
+                    <DialogClose asChild>
+                        <Button type="submit">{'Aceptar cita'}</Button>
+                    </DialogClose>
                 </form>
             </DialogContent>
         </Dialog>
@@ -163,23 +182,3 @@ export function AppointmentDetail({appointment}: AppointmentDetailProps) {
 }
 
 export default AppointmentDetail;
-
-
-// <Select
-//     onValueChange={(value) => form.setValue("doctorId", value)}
-// >
-//     <SelectTrigger>
-//         <SelectValue placeholder="Selecciona un doctor"/>
-//     </SelectTrigger>
-//     <SelectContent>
-//         {doctors?.map((doctor: {
-//             id: string;
-//             name: string;
-//         }, index: Key | null | undefined) => (
-//             <SelectItem
-//                 key={index}
-//                 value={doctor.id}
-//             >{doctor.name}</SelectItem>
-//         ))}
-//     </SelectContent>
-// </Select>

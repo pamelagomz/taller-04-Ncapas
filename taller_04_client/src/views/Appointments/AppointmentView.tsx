@@ -12,10 +12,23 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import DatePickerForm from "@/components/ui/datepicker.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
-import React from "react";
+import React, {useState} from "react";
 import {cn} from "@/lib/utils.ts";
 import {Badge} from "@/components/ui/badge.tsx";
-import {requestAppointment} from "@/hooks/Appointments.tsx";
+import {cancelAppointment, getOwnAppointments, requestAppointment} from "@/hooks/Appointments.tsx";
+import useSWR, {mutate} from "swr";
+import {format} from "date-fns";
+import {es} from "date-fns/locale";
+import {useAuthContext} from "@/providers/AuthContext.tsx";
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card.tsx";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+} from "@/components/ui/select.tsx";
 
 export const FormSchema = z.object({
     reason: z.string({
@@ -27,6 +40,8 @@ export const FormSchema = z.object({
 })
 
 export default function AppointmentView() {
+    const { user } = useAuthContext()
+    const [state, setState] = useState<string>("")
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -41,13 +56,23 @@ export default function AppointmentView() {
             toast.error("Error al agendar la cita")
             return
         }
+        toast.promise(
+            mutate('/appointment/own'),
+            {
+                loading: 'Loading...',
+                success: 'Appointment updated!',
+                error: 'An error occurred',
+            }
+        )
     }
+
+    const { data , isLoading} = useSWR(['/appointment/own', state], getOwnAppointments)
 
     return (
         <section
-            className={"flex flex-row container h-dvh justify-around items-center"}
+            className={"flex flex-row container min-h-dvh justify-around items-start"}
         >
-            <Card className="sticky mx-auto shadow-lg w-[30rem] p-4">
+            <Card className="sticky top-12 mx-auto shadow-lg w-[30rem] p-4">
                 <CardHeader>
                     <CardTitle className="text-2xl">Agenda una cita</CardTitle>
                 </CardHeader>
@@ -86,44 +111,81 @@ export default function AppointmentView() {
             </Card>
 
             <div
-                className={'flex flex-col gap-8 font-bold items-start px-12 justify-center w-1/2 h-dvh'}>
-                <h1 className={"text-2xl"}>{"Aqui podras ver la lista de tu citas"}/a</h1>
-                <AppointmentCard/>
+                className={'flex flex-row flex-wrap w-2/3 gap-8 font-bold items-center px-12 justify-center py-10'}>
+                <div className={'flex flex-row gap-4 items-center'}>
+                    <h1 className={"text-2xl"}>{"Aqui podras ver la lista de tu citas"}</h1>
+                    <Select onValueChange={
+                        (value) => setState(value == 'All' ? '' : value)} defaultValue={""}>
+                        <SelectTrigger className="w-fit">
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Status</SelectLabel>
+                                <SelectItem value="Approved">Approved</SelectItem>
+                                <SelectItem value="Rejected">Rejected</SelectItem>
+                                <SelectItem value="Requested">Requested</SelectItem>
+                                <SelectItem value="Canceled">Canceled</SelectItem>
+                                <SelectItem value="In progress">In progress</SelectItem>
+                                <SelectItem value="Completed">Completed</SelectItem>
+                                <SelectItem value="All">All</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                {isLoading && <p>Loading...</p>}
+                {
+                    user && user.roles.map(
+                        (role) => role.name === "Patient"
+                    ) && (
+                        data?.map((
+                            appointment: AppointmentRequest,
+                            index: number
+                        ) => (
+                            <AppointmentCard
+                                key={index}
+                                appointment={appointment}
+                            />
+                        ))
+                    )
+                }
             </div>
         </section>
     );
 }
 
-const preescriptions = [
-    {
-        title: "Aceclofenac 100mg",
-        description: "20 tablets every 8 hours",
-    },
-    {
-        title: "Paracetamol 500mg",
-        description: "10 tablets every 6 hours",
-    },
-    {
-        title: "Ibuprofen 200mg",
-        description: "10 tablets every 8 hours",
-    },
-]
+type AppointmentCardProps = {
+    appointment: AppointmentRequest
+}
 
-type CardProps = React.ComponentProps<typeof Card>
+type CardProps = React.ComponentProps<typeof Card> & AppointmentCardProps;
 
-export function AppointmentCard({ className, ...props }: CardProps) {
+export function AppointmentCard({className, appointment, ...props}: CardProps) {
+
+    const date = new Date(appointment.f_solicitada!);
+    const formattedDate = format(date, "PPP, p", {locale: es})
+
     return (
-        <Card className={cn("w-full font-normal", className)} {...props}>
+        <Card className={cn("w-[450px] font-normal", className)} {...props}>
             <CardHeader>
-                <CardTitle>Dolor de cabeza | 24 de Mayo 2024</CardTitle>
+                <CardTitle className={'text-lg font-medium'}>
+                    <HoverCard>
+                        <HoverCardTrigger>
+                            {appointment.reason.length > 50
+                                ? `${appointment.reason.substring(0, 50)}..`
+                                : appointment.reason}
+                        </HoverCardTrigger>
+                        <HoverCardContent>
+                            {appointment.reason}
+                        </HoverCardContent>
+                    </HoverCard>
+                </CardTitle>
+                <div className={'flex flex-row gap-4 items-center text-sm text-gray-500'}><Badge
+                    className={"w-fit font-normal p-2 rounded-xl"}
+                    variant="default">{appointment.state}</Badge> {formattedDate}</div>
             </CardHeader>
             <CardContent className="grid gap-4">
-                <Badge className={"w-fit font-normal p-2 rounded-xl"} variant="default">Completada</Badge>
-                <span>
-                    Preecripcion medica
-                </span>
                 <div>
-                    {preescriptions.map((notification, index) => (
+                    {appointment.prescriptions.map((notification, index) => (
                         <div
                             key={index}
                             className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
@@ -131,15 +193,37 @@ export function AppointmentCard({ className, ...props }: CardProps) {
                             <span className="flex h-2 w-2 translate-y-1 rounded-full bg-emerald-950" />
                             <div className="space-y-1">
                                 <p className="text-sm font-medium leading-none">
-                                    {notification.title}
+                                    {notification.medicine}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    {notification.description}
+                                    {notification.dosis}
                                 </p>
                             </div>
                         </div>
                     ))}
                 </div>
+                <Button
+                    variant={'outline'}
+                    size={'lg'}
+                    onClick={ () => {
+                        if (appointment.state === 'Canceled'){
+                            toast.error("La cita ya ha sido cancelada")
+                            return
+                        }
+                        toast.promise(
+                            cancelAppointment(appointment.id),
+                            {
+                                loading: 'Cancelando cita',
+                                success: () => {
+                                    return 'Cita cancelada'
+                                },
+                                error: 'Error al cancelar la cita',
+                            }
+                        )
+                    }}
+                >
+                    Cancelar cita
+                </Button>
             </CardContent>
         </Card>
     )
