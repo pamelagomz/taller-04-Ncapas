@@ -1,0 +1,23 @@
+#spring.application.name=parcial02
+
+spring:
+  application:
+    name: parcial02
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:postgresql://localhost:5432/parcial02 #jdbc:mysql://localhost:3306/neighsecure?useSSL=false
+    username: postgres
+    password: 200317
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+    show-sql: true
+
+jwt:
+  secret: superUltraMegaDuperAlphaSecret360BrokenPassword
+  exptime: 1296000000
