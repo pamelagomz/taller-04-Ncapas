@@ -54,7 +54,12 @@ export default function RegisterView() {
         <section
             className={"flex flex-row h-dvh justify-around items-center"}
         >
-            <div className={'flex flex-col gap-8 text-white font-bold items-start px-24 justify-center w-1/2 h-dvh bg-gray-950'}>
+            <div
+                style={{
+                    backgroundImage: `url("/bgphoto.jpg")`,
+                }}
+                className={'flex flex-col gap-8 bg-cover bg-gray-950/80 bg-center bg-blend-darken text-white font-bold items-start px-24 justify-center w-1/2 h-dvh bg-gray-950'}
+            >
                 <h1 className={"text-2xl"}>{"Bienvenido"}/a</h1>
                 <p className={"text-secondaryText text-xl font-light w-1/2"}>
                     {"Clinica YaMerito, registrate para agendar una cita"}
@@ -79,6 +84,7 @@ export default function RegisterView() {
                                 placeholder="Carlos Perez"
                                 required
                             />
+                            {form.formState.errors.name && (<small className="text-red-500">{form.formState.errors.name.message}</small>)}
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
@@ -89,6 +95,7 @@ export default function RegisterView() {
                                 placeholder="m@example.com"
                                 required
                             />
+                            {form.formState.errors.email && (<small className="text-red-500">{form.formState.errors.email.message}</small>)}
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="password">Password</Label>
@@ -99,13 +106,13 @@ export default function RegisterView() {
                                 required
                                 type="password"
                             />
+                            {form.formState.errors.password && (<small className="text-red-500">{form.formState.errors.password.message}</small>)}
                         </div>
 
                         <Button
                             type={"submit"}
                             className="w-full"
                             disabled={form.formState.isSubmitting}
-                            // onClick={() => {onSubmit(form.getValues() as z.infer<typeof registerSchema>)}}
                         >
                             Crear una cuenta
                         </Button>

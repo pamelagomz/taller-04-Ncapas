@@ -1,12 +1,21 @@
-import {Outlet} from "react-router-dom";
+import {Outlet, useNavigate} from "react-router-dom";
 import Navbar from "@/components/Navbar.tsx";
+import {useAuthContext} from "@/providers/AuthContext.tsx";
+import {useEffect} from "react";
 
 export default function AdminRoute() {
-    /*const {user} = UseUserContext();
+    const {user} = useAuthContext();
+    const navigate = useNavigate();
 
-    if (!user) {
-        return <Navigate to={LOGIN} />;
-    }*/
+    useEffect(() => {
+        // Check if user information has been fetched
+        if (user !== null) {
+            // If user does not have the 'Admin' role, redirect to '/user'
+            if (!user.roles.map(r => r.name).includes("Admin")) {
+                navigate("/user");
+            }
+        }
+    }, [user, navigate]);
 
     const routes = [
         {

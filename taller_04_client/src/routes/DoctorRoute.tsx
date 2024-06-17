@@ -1,17 +1,22 @@
 import { Outlet, useNavigate} from "react-router-dom";
 import {useAuthContext} from "@/providers/AuthContext.tsx";
 import Navbar from "@/components/Navbar.tsx";
+import {useEffect} from "react";
 
 export default function DoctorRoute() {
 
+    const {user} = useAuthContext();
     const navigate = useNavigate();
-    const {user, logout} = useAuthContext();
 
-    // useEffect(() => {
-    //     if (!user?.roles.includes("Assitant")) {
-    //         return navigate("/");
-    //     }
-    // }, []);
+    useEffect(() => {
+        // Check if user information has been fetched
+        if (user !== null) {
+            // If user does not have the 'Admin' role, redirect to '/user'
+            if (!user.roles.map(r => r.name).includes("Doctor")) {
+                navigate("/user");
+            }
+        }
+    }, [user, navigate]);
 
     const routes = [
         {

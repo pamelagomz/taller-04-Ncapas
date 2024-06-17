@@ -1,19 +1,22 @@
-import {Link, Outlet, useNavigate} from "react-router-dom";
+import { Outlet, useNavigate} from "react-router-dom";
 import {useAuthContext} from "@/providers/AuthContext.tsx";
-import {Button} from "@/components/ui/button.tsx";
-import {useEffect} from "react";
 import Navbar from "@/components/Navbar.tsx";
+import {useEffect} from "react";
 
 export default function AssistantsRoute() {
 
     const navigate = useNavigate();
-    const {user, logout} = useAuthContext();
+    const {user} = useAuthContext();
 
-    // useEffect(() => {
-    //     if (!user?.roles.includes("Assitant")) {
-    //         return navigate("/");
-    //     }
-    // }, []);
+    useEffect(() => {
+        // Check if user information has been fetched
+        if (user !== null) {
+            // If user does not have the 'Admin' role, redirect to '/user'
+            if (!user.roles.map(r => r.name).includes("Assistant")) {
+                navigate("/user");
+            }
+        }
+    }, [user, navigate]);
 
     const routes = [
         {

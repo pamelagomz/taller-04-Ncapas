@@ -75,6 +75,7 @@ export default function LoginView() {
                                 placeholder="m@example.com"
                                 required
                             />
+                            {form.formState.errors.email && (<small className="text-red-500">{form.formState.errors.email.message}</small>)}
                         </div>
 
                         <div className="grid gap-2">
@@ -88,6 +89,7 @@ export default function LoginView() {
                                 type="password"
                                 required
                             />
+                            {form.formState.errors.password && (<small className="text-red-500">{form.formState.errors.password.message}</small>)}
                         </div>
 
                         <Button type="submit" className="w-full">

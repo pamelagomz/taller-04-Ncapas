@@ -55,17 +55,17 @@ export const AuthContextProvider = (props) => {
             toast.success("Inicio de sesión exitoso");
             return true;
         } catch (error) {
-          // let status = "500"; // Default status
-          // if (axios.isAxiosError(error)) {
-          //   status = error.response?.status.toString() || "500";
-          // }
-          // const msgs = {
-          //   "404": "User not found",
-          //   "409": "Email already in use",
-          //   "400": "Email o contraseña incorrectos",
-          //   "500": "Unexpected error"
-          // };
-          // toast.error(msgs[status as "404" | "400" | "500" | "409"]);
+          let status = "500"; // Default status
+          if (axios.isAxiosError(error)) {
+            status = error.response?.status.toString() || "500";
+          }
+          const msgs = {
+            "404": "User not found",
+            "409": "Email already in use",
+            "400": "Email o contraseña incorrectos",
+            "500": "Unexpected error"
+          };
+          toast.error(msgs[status as "404" | "400" | "500" | "409"]);
           return false;
         }
     }
@@ -99,7 +99,7 @@ export const AuthContextProvider = (props) => {
         removeTokenLS();
         setToken(null);
         setUser(null);
-        window.location.href = "https://localhost:5173/";
+        window.location.replace("/")
     };
 
     const state: AuthContextProviderProps = {

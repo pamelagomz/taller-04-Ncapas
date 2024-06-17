@@ -1,17 +1,7 @@
-import { Outlet, useNavigate} from "react-router-dom";
-import {useAuthContext} from "@/providers/AuthContext.tsx";
+import { Outlet } from "react-router-dom";
 import Navbar from "@/components/Navbar.tsx";
 
 export default function UserRoute() {
-
-    // const navigate = useNavigate();
-    // const {user, logout} = useAuthContext();
-
-    // useEffect(() => {
-    //     if (!user?.roles.includes("Assitant")) {
-    //         return navigate("/");
-    //     }
-    // }, []);
 
     const routes = [
         {

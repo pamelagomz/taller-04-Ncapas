@@ -119,7 +119,7 @@ export default function AppointmentTableView() {
     ];
 
     return (
-        <div className="container min-h-[100dvh] flex flex-col justify-center items-center gap-12">
+        <div className="container min-h-[100dvh] h-full py-16 flex flex-col justify-center items-center gap-12">
             <Card className={'w-full'}>
                 <CardHeader>
                     <CardTitle>Lista de solicitudes de citas medicas</CardTitle>

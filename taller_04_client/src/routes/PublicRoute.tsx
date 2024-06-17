@@ -1,15 +1,6 @@
-import {Navigate, Outlet} from 'react-router-dom';
-//import {PRIVATE} from "@/routes/path.jsx";
-//import {UseUserContext} from "@/contexts/UserContext.jsx";
+import { Outlet } from 'react-router-dom';
 
 export default function PublicRoute() {
-
-    /*const {user} = UseUserContext();
-
-    if (user) {
-        return <Navigate to={PRIVATE} />;
-    }*/
-
     return (
         <div>
             <Outlet />
