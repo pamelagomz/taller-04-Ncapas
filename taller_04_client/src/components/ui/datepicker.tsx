@@ -7,13 +7,12 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { useController, UseControllerProps } from "react-hook-form";
-import {FormSchema} from "@/views/AppointmentView.tsx";
-import {z} from "zod";
+import {useController, UseControllerProps} from "react-hook-form";
 import {MdOutlineCalendarMonth} from "react-icons/md";
 import {es} from "date-fns/locale";
 
-const DatePickerForm = (props: UseControllerProps<z.infer<typeof FormSchema>>) => {
+
+const DatePickerForm = (props: UseControllerProps) => {
 
     const {field } = useController(props);
 
